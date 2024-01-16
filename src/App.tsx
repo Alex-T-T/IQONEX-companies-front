@@ -15,7 +15,7 @@ function App() {
                     background: 'transparent',
                 }}
             >
-                <Title>IQUNEX test</Title>
+                <Title>IQONEX test</Title>
             </Header>
             <Divider />
             <Content>
@@ -27,7 +27,7 @@ function App() {
             </Content>
             <Divider />
             <Footer>
-                <Text>Created as a test task for IQUNEX</Text>
+                <Text>Created as a test task for IQONEX</Text>
             </Footer>
         </Layout>
     );

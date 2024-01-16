@@ -152,7 +152,7 @@ function CompaniesList() {
         },
     ];
 
-    const dataSource: DataType[] = companies.map((company) => ({
+    const dataSource: DataType[] = companies?.map((company) => ({
         ...company,
         key: company.companyname,
     }));
@@ -237,54 +237,58 @@ function CompaniesList() {
     return (
         <>
             {contextHolder}
-            <Table
-                title={() => (
-                    <div
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                        }}
-                    >
-                        <Title level={3}>Companies</Title>
-                        <Button
-                            type="primary"
-                            icon={<PlusCircleTwoTone />}
-                            onClick={() => setIsCreateModal(true)}
-                        >
-                            Add
-                        </Button>
-                        <CompanyCreateForm
-                            open={isCreateModal}
-                            onCreate={onCreate}
-                            onCancel={() => {
-                                setIsCreateModal(false);
+            {companies ? (
+                <Table
+                    title={() => (
+                        <div
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
                             }}
-                        />
-                    </div>
-                )}
-                columns={columns}
-                dataSource={dataSource}
-                pagination={{
-                    defaultCurrent: 1,
-                    defaultPageSize: 100,
-                    showSizeChanger: false,
-                    total: total,
-                    showTotal: showTotal,
-                    onChange: (page: number, pageSize: number) => {
-                        onPaginationChange(page, pageSize);
-                        setCurrentPage(page);
-                    },
-                    position: ['topRight', 'bottomRight'],
-                }}
-                scroll={{ x: 1500, y: 500 }}
-                bordered
-                loading={{
-                    size: 'large',
-                    tip: 'Loading...',
-                    spinning: isLoading,
-                }}
-            />
+                        >
+                            <Title level={3}>Companies</Title>
+                            <Button
+                                type="primary"
+                                icon={<PlusCircleTwoTone />}
+                                onClick={() => setIsCreateModal(true)}
+                            >
+                                Add
+                            </Button>
+                            <CompanyCreateForm
+                                open={isCreateModal}
+                                onCreate={onCreate}
+                                onCancel={() => {
+                                    setIsCreateModal(false);
+                                }}
+                            />
+                        </div>
+                    )}
+                    columns={columns}
+                    dataSource={dataSource}
+                    pagination={{
+                        defaultCurrent: 1,
+                        defaultPageSize: 100,
+                        showSizeChanger: false,
+                        total: total,
+                        showTotal: showTotal,
+                        onChange: (page: number, pageSize: number) => {
+                            onPaginationChange(page, pageSize);
+                            setCurrentPage(page);
+                        },
+                        position: ['topRight', 'bottomRight'],
+                    }}
+                    scroll={{ x: 1500, y: 500 }}
+                    bordered
+                    loading={{
+                        size: 'large',
+                        tip: 'Loading...',
+                        spinning: isLoading,
+                    }}
+                />
+            ) : (
+                <Text>Maybe server is sleaping now. Try again layter.</Text>
+            )}
             <CompanyEditForm
                 key={selectedCompany?.companyname}
                 open={isEditModal}

@@ -1,50 +1,35 @@
-import { useEffect, useState } from 'react';
+import { Col, Divider, Row } from 'antd';
 import './App.css';
-import { CompanyType } from './types/company.type';
-import { companiesApi } from './API/companies.api';
-import { RotatingLines } from 'react-loader-spinner';
-import { AxiosError } from 'axios';
+import CompaniesList from './components/CompaniesList';
+import Layout, { Content, Footer, Header } from 'antd/es/layout/layout';
+import Text from 'antd/es/typography/Text';
+import Title from 'antd/es/typography/Title';
 
 function App() {
-    const [companies, setCompanies] = useState<CompanyType[]>([]);
-    const [loading, setIsLoading] = useState(false);
-
-    useEffect(() => {
-        setIsLoading(true);
-        companiesApi
-            .getCompanies()
-            .then((res) => {
-                setCompanies(res?.data);
-            })
-            .catch((error: AxiosError) => console.log(error.message))
-            .finally(() => setIsLoading(false));
-    }, []);
-
     return (
-        <div className="App">
-            Our app
-            <ul>
-                {companies.length > 0 && !loading
-                    ? companies.map((company, index) => (
-                          <li key={company.companyname}>
-                              {index + 1}
-                              {company.companyname}
-                          </li>
-                      ))
-                    : null}
-                <RotatingLines
-                    visible={loading}
-                    // height="96"
-                    width="96"
-                    // color="grey"
-                    strokeWidth="5"
-                    animationDuration="0.75"
-                    ariaLabel="rotating-lines-loading"
-                    // wrapperStyle={{}}
-                    // wrapperClass=""
-                />
-            </ul>
-        </div>
+        <Layout>
+            <Header
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    background: 'transparent',
+                }}
+            >
+                <Title>IQUNEX test</Title>
+            </Header>
+            <Divider />
+            <Content>
+                <Row>
+                    <Col xs={24} md={{ span: 22, offset: 1 }}>
+                        <CompaniesList />
+                    </Col>
+                </Row>
+            </Content>
+            <Divider />
+            <Footer>
+                <Text>Created as a test task for IQUNEX</Text>
+            </Footer>
+        </Layout>
     );
 }
 

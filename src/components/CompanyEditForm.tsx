@@ -2,28 +2,34 @@ import { Form, Modal } from 'antd';
 import CompanyForm from './CompanyForm';
 import { CompanyType } from '../types/company.type';
 
-const CompanyCreateForm = ({
+const CompanyEditForm = ({
     open,
-    onCreate,
+    onEdit,
     onCancel,
+    data,
 }: {
     open: boolean;
-    onCreate: (values: CompanyType) => void;
+    onEdit: (companyname: string, values: CompanyType) => void;
     onCancel: () => void;
+    data: CompanyType | null;
 }) => {
     const [form] = Form.useForm();
     return (
         <Modal
             open={open}
-            title="Create a new company"
-            okText="Create"
+            title="Edit the company"
+            okText="Update"
             cancelText="Cancel"
-            onCancel={onCancel}
+            onCancel={() => {
+                onCancel();
+                Modal.destroyAll();
+            }}
             onOk={async () => {
                 form.validateFields({ validateOnly: true })
                     .then((values) => {
-                        onCreate(values);
+                        onEdit(data?.companyname as string, values);
                         form.resetFields();
+                        Modal.destroyAll();
                     })
                     .catch((info) => {
                         console.log('Validate Failed:', info);
@@ -31,9 +37,9 @@ const CompanyCreateForm = ({
             }}
             width={1000}
         >
-            <CompanyForm form={form} variant="create" />
+            <CompanyForm form={form} variant="update" data={data} />
         </Modal>
     );
 };
 
-export default CompanyCreateForm;
+export default CompanyEditForm;

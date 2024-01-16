@@ -48,8 +48,16 @@ export const companiesApi = {
     },
 
     updateCompany: async (name: string, data: CompanyType) => {
+        const filteredData: { [key: string]: string | number | Dayjs } = {};
+
+        for (const key in data) {
+            if (data[key] !== '') {
+                filteredData[key] = data[key];
+            }
+        }
+
         return instance
-            .patch(`/${HttpRoutesEnums.COMPANIES}/${name}`, data)
+            .patch(`/${HttpRoutesEnums.COMPANIES}/${name}`, filteredData)
             .then((res) => {
                 if (res.statusText !== 'OK') {
                     throw new Error(res.statusText);

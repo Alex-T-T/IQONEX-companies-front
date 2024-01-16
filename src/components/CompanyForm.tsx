@@ -1,41 +1,27 @@
-import { Col, DatePicker, Form, Input, Row } from 'antd';
+import {
+    Col,
+    DatePicker,
+    Form,
+    FormInstance,
+    Input,
+    InputNumber,
+    Row,
+} from 'antd';
 import { CompanyType } from '../types/company.type';
-import { DataType } from './CompaniesList';
+
 import dayjs from 'dayjs';
 
 type companyFormVariantType = 'update' | 'create';
 
 function CompanyForm({
-    onSubmit,
-    formId,
-    data,
+    form,
     variant,
+    data,
 }: {
-    onSubmit: (...args: any[]) => any;
-    formId: string;
+    form: FormInstance<any>;
     variant: companyFormVariantType;
-    data?: DataType;
+    data?: CompanyType | null;
 }) {
-    // const handleSubmit = async (values: CompanyType) => {
-    //     console.log('values: ', values);
-    //     onSubmit(values);
-    // };
-
-    // const [form] = Form.useForm();
-    // const handleSubmit = async (
-    //     // event: React.FormEvent<HTMLInputElement>,
-    //     values: CompanyType
-    // ) => {
-    //     // event.preventDefault();
-    //     console.log('values: ', values);
-    //     try {
-    //         const values = await form.validateFields();
-    //         onSubmit(values);
-    //     } catch (errorInfo) {
-    //         console.log('Validation failed:', errorInfo);
-    //     }
-    // };
-
     const initialValues =
         variant === 'update' && data
             ? {
@@ -67,12 +53,11 @@ function CompanyForm({
 
     return (
         <Form
-            // form={form}
-            // validateTrigger="onBlur"
-            // onFinish={handleSubmit}
+            key={data?.companyname}
+            form={form}
+            validateTrigger="onBlur"
             autoComplete="off"
             layout="vertical"
-            id={formId}
             initialValues={initialValues}
         >
             <Row gutter={32}>
@@ -84,7 +69,8 @@ function CompanyForm({
                             {
                                 min: 3,
                                 required: true,
-                                message: 'Please input the company name!',
+                                message:
+                                    'Please input the company name! Min length - 3 characters.',
                             },
                         ]}
                     >
@@ -92,7 +78,6 @@ function CompanyForm({
                             type="text"
                             variant="outlined"
                             name="companyname"
-                            // required
                         />
                     </Form.Item>
                     <Form.Item
@@ -111,8 +96,8 @@ function CompanyForm({
                         <Input type="text" variant="outlined" name="city" />
                     </Form.Item>
                     <Form.Item label="Postal code" name="postalcode">
-                        <Input
-                            type="text"
+                        <InputNumber
+                            type="number"
                             variant="outlined"
                             name="postalcode"
                         />

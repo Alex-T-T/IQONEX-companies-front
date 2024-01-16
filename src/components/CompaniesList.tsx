@@ -10,10 +10,10 @@ import { companiesApi } from '../API/companies.api';
 import { CompanyType } from '../types/company.type';
 import ActionButtons from './ActionButtons';
 import { showDeleteConfirm } from './confirms/Delete.confirm';
-import { ShowEditConfirm } from './confirms/Edit.confirm';
 import dayjs from 'dayjs';
 import { PlusCircleTwoTone } from '@ant-design/icons';
 import CompanyCreateForm from './CompanyCreateForm';
+import CompanyEditForm from './CompanyEditForm';
 
 type keyType = {
     key: React.Key;
@@ -27,6 +27,10 @@ function CompaniesList() {
     const [curentPage, setCurrentPage] = useState(1);
     const [messageApi, contextHolder] = message.useMessage();
     const [isCreateModal, setIsCreateModal] = useState(false);
+    const [isEditModal, setIsEditModal] = useState(false);
+    const [selectedCompany, setSelectedCompany] = useState<CompanyType | null>(
+        null
+    );
 
     useEffect(() => {
         setIsLoading(true);
@@ -74,6 +78,7 @@ function CompaniesList() {
             dataIndex: 'country',
             key: 'country',
             width: 150,
+            render: (_, record) => (record.country ? record.country : ''),
         },
         {
             title: 'City',
@@ -86,30 +91,40 @@ function CompaniesList() {
             dataIndex: 'postalcode',
             key: 'postalcode',
             width: 110,
+            render: (_, record) =>
+                record.postalcode ? String(record.postalcode) : '',
         },
         {
             title: 'Street',
             dataIndex: 'street',
             key: 'street',
             width: 150,
+            render: (_, record) => (record.street ? record.street : ''),
         },
         {
             title: 'Housenumber',
             dataIndex: 'housenumber',
             key: 'housenumber',
             width: 100,
+            render: (_, record) =>
+                record.housenumber ? record.housenumber : '',
         },
         {
             title: 'State',
             dataIndex: 'state',
             key: 'state',
             width: 150,
+            render: (_, record) => (record.state ? record.state : ''),
         },
         {
             title: 'Object of the company',
             dataIndex: 'object_of_the_company',
             key: 'object_of_the_company',
             width: 400,
+            render: (_, record) =>
+                record.object_of_the_company
+                    ? record.object_of_the_company
+                    : '',
         },
         {
             title: 'Action',
@@ -119,15 +134,10 @@ function CompaniesList() {
             width: 220,
             render: (_, record) => (
                 <ActionButtons
-                    onEditClick={() =>
-                        ShowEditConfirm(
-                            record,
-                            setIsLoading,
-                            setCompanies,
-                            successMessage,
-                            errorMessage
-                        )
-                    }
+                    onEditClick={() => {
+                        setSelectedCompany(record);
+                        setIsEditModal(true);
+                    }}
                     onDeleteClick={() =>
                         showDeleteConfirm(
                             record.companyname,
@@ -178,17 +188,50 @@ function CompaniesList() {
         });
     };
 
-    const onCreate = async (values: any) => {
-        console.log('Received values of form: ', values);
+    const onCreate = async (values: CompanyType) => {
+        setIsLoading(true);
         companiesApi
             .createCompany(values)
-            .then(() =>
+            .then(() => {
                 successMessage(
                     `Company ${values.companyname} successfully created`
-                )
-            )
+                );
+                setTotal((prev) => prev + 1);
+                companiesApi.getCompanies().then((res) => {
+                    setCompanies(res?.data);
+                    setTotal(res?.length);
+                });
+            })
             .catch((error) => errorMessage(error))
-            .finally(() => setIsCreateModal(false));
+            .finally(() => {
+                setIsCreateModal(false);
+                setIsLoading(false);
+            });
+    };
+
+    const onEdit = async (companyname: string, values: CompanyType) => {
+        setIsLoading(true);
+        companiesApi
+            .updateCompany(companyname, values)
+            .then(() => {
+                setCompanies((prev) => {
+                    const companyIndex = prev.findIndex(
+                        (company) => company.companyname === companyname
+                    );
+
+                    const updatedCompanies = [...prev];
+                    updatedCompanies[companyIndex] = { ...values };
+                    return updatedCompanies;
+                });
+                successMessage(
+                    `Company ${values.companyname} successfully updated`
+                );
+            })
+            .catch((error) => errorMessage(error))
+            .finally(() => {
+                setIsEditModal(false);
+                setIsLoading(false);
+            });
     };
 
     return (
@@ -207,16 +250,7 @@ function CompaniesList() {
                         <Button
                             type="primary"
                             icon={<PlusCircleTwoTone />}
-                            onClick={
-                                () => setIsCreateModal(true)
-                                // () =>
-                                // ShowCreateConfirm(
-                                //     setIsLoading,
-                                //     setCompanies,
-                                //     successMessage,
-                                //     errorMessage
-                                // )
-                            }
+                            onClick={() => setIsCreateModal(true)}
                         >
                             Add
                         </Button>
@@ -250,6 +284,16 @@ function CompaniesList() {
                     tip: 'Loading...',
                     spinning: isLoading,
                 }}
+            />
+            <CompanyEditForm
+                key={selectedCompany?.companyname}
+                open={isEditModal}
+                onEdit={onEdit}
+                onCancel={() => {
+                    setSelectedCompany(null);
+                    setIsEditModal(false);
+                }}
+                data={selectedCompany}
             />
         </>
     );
